@@ -4,9 +4,10 @@ from constants.abi import contract_abi
 from constants.constants import contract_address
 import os
 from dotenv import load_dotenv
+from pydantic import BaseModel
+
 
 load_dotenv()
-
 app = FastAPI()
 
 # Connect to the blockchain network
@@ -19,9 +20,9 @@ account = w3.eth.account.from_key(private_key)
 w3.eth.defaultAccount = account.address  # Set the account as the default account
 
 
-@app.get("/")
-async def root():
-    tx = contract.functions.addUserPermission(10, 10).build_transaction({
+@app.get("/assign_permission", tags=['Permissions'], summary="Assign permission for a user to control devices in a room")
+async def assign_permission(user_id: int, room_id: int):
+    tx = contract.functions.addUserPermission(user_id, room_id).build_transaction({
         'gas': 200000,
         'gasPrice': w3.toWei('1.05', 'gwei'),
         'nonce': w3.eth.get_transaction_count(w3.eth.defaultAccount),
@@ -34,6 +35,14 @@ async def root():
     print(t.hex())
 
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+class Request(BaseModel):
+    username: str
+
+
+@app.post("/guides", tags=['Guides'], summary="Returns list of guides for a user by their username")
+async def get_guides_by_user(request: Request):
+    print(contract.functions.getGuidesByUsername(request.username).call())
+    return request.username
+
+
+

@@ -1,1 +1,1 @@
-contract_address = '0x7b02eF83aF1541338F6616e9A4D7115fF7091781'
+contract_address = '0x654eABb5974dbE29ea1A0462D9eA2d3F9B8a2fe2'

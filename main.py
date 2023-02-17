@@ -20,9 +20,14 @@ account = w3.eth.account.from_key(private_key)
 w3.eth.defaultAccount = account.address  # Set the account as the default account
 
 
-@app.get("/assign_user_permission", tags=['Permissions'], summary="Assign permission for a user to control devices in a room")
-async def assign_user_permission(user_id: int, room_id: int):
-    tx = contract.functions.addUserPermission(user_id, room_id).build_transaction({
+class UserRoomRequest(BaseModel):
+    user_id: int
+    room_id: int
+
+
+@app.post("/assign_user_permission", tags=['Permissions'], summary="Assign permission for a user to control devices in a room")
+async def assign_user_permission(request: UserRoomRequest):
+    tx = contract.functions.addUserPermission(request.user_id, request.room_id).build_transaction({
         'gas': 200000,
         'gasPrice': w3.toWei('1.05', 'gwei'),
         'nonce': w3.eth.get_transaction_count(w3.eth.defaultAccount),
@@ -35,9 +40,14 @@ async def assign_user_permission(user_id: int, room_id: int):
     print(t.hex())
 
 
-@app.get("/assign_group_permission", tags=['Permissions'], summary="Assign permission for a group to control devices in a room")
-async def assign_group_permission(group_id: int, room_id: int):
-    tx = contract.functions.addGroupPermission(group_id, room_id).build_transaction({
+class GroupRoomRequest(BaseModel):
+    user_id: int
+    room_id: int
+
+
+@app.post("/assign_group_permission", tags=['Permissions'], summary="Assign permission for a group to control devices in a room")
+async def assign_group_permission(request: GroupRoomRequest):
+    tx = contract.functions.addGroupPermission(request.room_id, request.room_id).build_transaction({
         'gas': 200000,
         'gasPrice': w3.toWei('1.05', 'gwei'),
         'nonce': w3.eth.get_transaction_count(w3.eth.defaultAccount),
@@ -60,14 +70,14 @@ async def check_group_permission(group_id: int, room_id: int):
     return contract.functions.checkGroupPermission(group_id, room_id).call()
 
 
-class Request(BaseModel):
+class GuideRequest(BaseModel):
     username: str
 
 
 @app.post("/guides", tags=['Guides'], summary="Returns list of guides for a user by their username")
-async def get_guides_by_user(request: Request):
-    print(contract.functions.getGuidesByUsername(request.username).call())
-    return request.username
+async def get_guides_by_user(request: GuideRequest):
+    return contract.functions.getGuidesByUsername(request.username).call()
+
 
 
 

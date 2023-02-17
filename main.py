@@ -1,20 +1,15 @@
 from fastapi import FastAPI
 from web3 import Web3
-import json
+from constants.abi import contract_abi
+from constants.constants import contract_address
 
 app = FastAPI()
 
 # Connect to the blockchain network
-w3 = Web3(Web3.HTTPProvider("https://rpc.sepolia.dev/"))
-
-# Load the smart contract ABI
-with open('contract.abi', 'r') as f:
-    contract_abi = json.load(f)
-
-# Instantiate the smart contract
-contract_address = '0xD8d1546c838091fDC3a01741eBfe1E8133560ecd'
+# w3 = Web3(Web3.HTTPProvider("https://rpc.sepolia.dev/"))
+# w3 = w3.eth.contract(address='0x7b02eF83aF1541338F6616e9A4D7115fF7091781', abi=abi)
+w3 = Web3(Web3.HTTPProvider("https://core.bloxberg.org"))
 contract = w3.eth.contract(address=contract_address, abi=contract_abi)
-
 
 # Load the account from a private key
 private_key = '450f187df076b5021adffec0f5a5aea216bd492c615d7a0be1fbfb788cf25522'
@@ -23,18 +18,17 @@ w3.eth.defaultAccount = account.address  # Set the account as the default accoun
 
 
 @app.get("/store")
-async def store(num: int):
-    print(num)
+async def store():
 
     # Construct the transaction object
-    #nonce = w3.eth.getTransactionCount(w3.eth.defaultAccount)
+    # nonce = w3.eth.getTransactionCount(w3.eth.defaultAccount)
+
     tx = {
         'from': w3.eth.defaultAccount,
-        'to': contract_address,
-        'gas': 2000000,
-        'gasPrice': 1000,
-        'nonce': 2,
-        'data': contract.functions.store(5)#.encodeABI()
+        'gas': 90000,
+        'gasPrice': 1000000,
+        'nonce': 1,
+        'data': contract.functions.addUserPermission(1, 101).transact()  # .encodeABI()
     }
 
     # Sign and send the transaction
@@ -60,7 +54,7 @@ async def store(num: int):
 
 @app.get("/")
 async def root():
-    return {"message": "Hello"}
+    print(contract.functions.checkUserPermission(1, 102).call())
 
 
 @app.get("/hello/{name}")

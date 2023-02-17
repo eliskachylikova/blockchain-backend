@@ -24,7 +24,7 @@ w3.eth.defaultAccount = account.address  # Set the account as the default accoun
 async def assign_user_permission(user_id: int, room_id: int):
     tx = contract.functions.addUserPermission(user_id, room_id).build_transaction({
         'gas': 200000,
-        'gasPrice': w3.to_wei('1.05', 'gwei'),
+        'gasPrice': w3.toWei('1.05', 'gwei'),
         'nonce': w3.eth.get_transaction_count(w3.eth.defaultAccount),
     })
 
@@ -39,7 +39,7 @@ async def assign_user_permission(user_id: int, room_id: int):
 async def assign_group_permission(group_id: int, room_id: int):
     tx = contract.functions.addGroupPermission(group_id, room_id).build_transaction({
         'gas': 200000,
-        'gasPrice': w3.to_wei('1.05', 'gwei'),
+        'gasPrice': w3.toWei('1.05', 'gwei'),
         'nonce': w3.eth.get_transaction_count(w3.eth.defaultAccount),
     })
 

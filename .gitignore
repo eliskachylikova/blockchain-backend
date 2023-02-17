@@ -1,6 +1,4 @@
 .env
-
 env/**
-
 .idea/**
-.idea/misc.xml
+.env
